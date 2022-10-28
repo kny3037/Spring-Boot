@@ -6,7 +6,7 @@ import com.springboot.hello.domian.dto.UserRequestDto;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/user")
 public class UserController {
     private final UserDao userDao;
 
@@ -14,7 +14,7 @@ public class UserController {
         this.userDao = userDao;
     }
 
-    @PostMapping("/user")
+    @PostMapping("")
     public User addAndselect(@RequestBody UserRequestDto userRequestDto){
         User user = (new User(userRequestDto.getId(),userRequestDto.getName(),userRequestDto.getPassword()));
         userDao.add(user);
