@@ -1,5 +1,6 @@
 package com.springboot.hello.parser;
 
+import com.springboot.hello.dao.HospitalDao;
 import com.springboot.hello.domian.Hospital;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,21 @@ class HospitalParserTest {
     String line1 = "\"1\",\"의원\",\"01_01_02_P\",\"3620000\",\"PHMA119993620020041100004\",\"19990612\",\"\",\"01\",\"영업/정상\",\"13\",\"영업중\",\"\",\"\",\"\",\"\",\"062-515-2875\",\"\",\"500881\",\"광주광역시 북구 풍향동 565번지 4호 3층\",\"광주광역시 북구 동문대로 24, 3층 (풍향동)\",\"61205\",\"효치과의원\",\"20211115113642\",\"U\",\"2021-11-17 02:40:00.0\",\"치과의원\",\"192630.735112\",\"185314.617632\",\"치과의원\",\"1\",\"0\",\"0\",\"52.29\",\"401\",\"치과\",\"\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"0\",\"\",";
 
     ReadLineContext<Hospital> hospitalReadLineContext = new ReadLineContext<Hospital>(new HospitalParser());
+
+    @Autowired
+    // HospitalDao는 Factory도 없는데 왜 될까? : 원래는 Factory 만들어서 @Configuration 달고 @Bean 해줘야 함.
+    // ->@SpringBootApplication이
+    // @Component 어노테이션이 달려있는 클래스들을 빈으로 등록해줌.
+    HospitalDao hospitalDao;
+
+    @Test
+    @DisplayName("Hospital이 insert가 잘 되는지")
+    void add() {
+        HospitalParser hp = new HospitalParser(); //csv를 파싱하는 기능.
+        Hospital hospital = hp.parse(line1);
+        hospitalDao.add(hospital);
+        //get이 없어서 assert는 눈으로......
+    }
 
     @Test
     @DisplayName("10만건 이상의 데이터가 파싱 되는지.")
