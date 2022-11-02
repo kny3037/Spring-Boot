@@ -2,6 +2,7 @@ package com.springboot.hello.parser;
 
 import com.springboot.hello.dao.HospitalDao;
 import com.springboot.hello.domian.Hospital;
+import com.springboot.hello.service.HospitalService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,39 @@ class HospitalParserTest {
     // @Component 어노테이션이 달려있는 클래스들을 빈으로 등록해줌.
     HospitalDao hospitalDao;
 
+    @Autowired
+    HospitalService hospitalService;
+
     @Test
     @DisplayName("Hospital이 insert가 잘 되는지")
-    void add() {
+    void addAndGet() {
+        hospitalDao.deleteAll();
+        assertEquals(0,hospitalDao.getCount());
         HospitalParser hp = new HospitalParser(); //csv를 파싱하는 기능.
         Hospital hospital = hp.parse(line1);
         hospitalDao.add(hospital);
-        //get이 없어서 assert는 눈으로......
+        assertEquals(1,hospitalDao.getCount());
+
+        Hospital selectedHospital = hospitalDao.findById(hospital.getId());
+
+        //findbyid
+        assertEquals(selectedHospital.getId(),hospital.getId());
+        assertEquals(selectedHospital.getOpenServiceName(),hospital.getOpenServiceName());
+        assertEquals(selectedHospital.getOpenLocalGovernmentCode(), hospital.getOpenLocalGovernmentCode());
+        assertEquals(selectedHospital.getManagementNumber(), hospital.getManagementNumber());
+        assertEquals(selectedHospital.getBusinessStatus(), hospital.getBusinessStatus());
+        assertEquals(selectedHospital.getBusinessStatusCode(), hospital.getBusinessStatusCode());
+        //날짜
+        assertTrue(selectedHospital.getLicenseDate().isEqual(hospital.getLicenseDate()));
+        assertEquals(selectedHospital.getPhone(), hospital.getPhone());
+        assertEquals(selectedHospital.getFullAddress(), hospital.getFullAddress());
+        assertEquals(selectedHospital.getRoadNameAddress(), hospital.getRoadNameAddress());
+        assertEquals(selectedHospital.getHospitalName(),hospital.getHospitalName());
+        assertEquals(selectedHospital.getBusinessTypeName(), hospital.getBusinessTypeName());
+        assertEquals(selectedHospital.getHealthcareProviderCount(), hospital.getHealthcareProviderCount());  //col : 29
+        assertEquals(selectedHospital.getPatientRoomCount(), hospital.getPatientRoomCount());  //col : 30
+        assertEquals(selectedHospital.getTotalNumberOfBeds(), hospital.getTotalNumberOfBeds());  //col : 31
+        assertEquals(selectedHospital.getTotalAreaSize(), hospital.getTotalAreaSize());
     }
 
     @Test
@@ -42,15 +69,13 @@ class HospitalParserTest {
     void oneHundreadThousandRows() throws IOException {
         // 서버환경에서 build 할 때 문제가 생길 수 있다.
         // 어디에서든지 실행할 수 있게 짜는 것이 목표
+        hospitalDao.deleteAll();
         String filename = "fulldata_01_01_02_P_의원.csv";
-        List<Hospital> hospitalList = hospitalReadLineContext.readByLine(filename);
-        assertTrue(hospitalList.size() > 1000);
-        assertTrue(hospitalList.size() > 10000);
+        int cnt = this.hospitalService.insertLargeVolumeHospitalData(filename);
+        assertTrue(cnt > 1000);
+        assertTrue(cnt > 10000);
 
-        for (int i = 0; i < 10; i++) {
-            System.out.println(hospitalList.get(i).getHospitalName());
-        }
-        System.out.printf("파싱된 데이터 개수:", hospitalList.size());
+        System.out.printf("파싱된 데이터 개수:", cnt);
     }
 
     @Test
