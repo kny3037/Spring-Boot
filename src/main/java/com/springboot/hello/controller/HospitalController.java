@@ -4,13 +4,18 @@ package com.springboot.hello.controller;
 import com.springboot.hello.dao.HospitalDao;
 import com.springboot.hello.domian.Hospital;
 import com.springboot.hello.parser.ReadLineContext;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/hospital")
+@Slf4j
 public class HospitalController {
     private final HospitalDao hospitalDao;
     private final ReadLineContext<Hospital> hospitalReadLineContext;
@@ -20,22 +25,33 @@ public class HospitalController {
         this.hospitalReadLineContext = hospitalReadLineContext;
     }
 
-    @PostMapping("/insert")
-    public String add() throws IOException {
-        List<Hospital> hospitalList = hospitalReadLineContext.readByLine("fulldata_01_01_02_P_의원.csv");
-        for (Hospital hospital : hospitalList){
+    @PostMapping("/all")
+    public String insertAll() throws IOException {
+        List<Hospital> hospitalList = hospitalReadLineContext.readByLine("./hospital_data.csv");
+        for(Hospital hospital : hospitalList) {
             hospitalDao.add(hospital);
         }
-        return "정상적으로 insert 되었습니다. ";
+
+        return "데이터 insert 성공";
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Hospital> get(@PathVariable Integer id){
+        Hospital hospital = hospitalDao.findById(id);
+        Optional<Hospital> opt = Optional.of(hospital);
+
+        if (!opt.isEmpty()) {
+            return ResponseEntity.ok().body(hospital);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Hospital());
+        }
+
     }
 
     @DeleteMapping("/deleteAll")
     public void delete(){
         hospitalDao.deleteAll();
     }
-
-
-
-
 
 }
