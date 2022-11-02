@@ -67,7 +67,7 @@ class HospitalParserTest {
     @Test
     @DisplayName("10만건 이상의 데이터가 파싱 되는지.")
     void oneHundreadThousandRows() throws IOException {
-        // 서버환경에서 build 할 때 문제가 생길 수 있다.
+        /*// 서버환경에서 build 할 때 문제가 생길 수 있다.
         // 어디에서든지 실행할 수 있게 짜는 것이 목표
         hospitalDao.deleteAll();
         String filename = "fulldata_01_01_02_P_의원.csv";
@@ -75,7 +75,7 @@ class HospitalParserTest {
         assertTrue(cnt > 1000);
         assertTrue(cnt > 10000);
 
-        System.out.printf("파싱된 데이터 개수:", cnt);
+        System.out.printf("파싱된 데이터 개수:", cnt);*/
     }
 
     @Test
